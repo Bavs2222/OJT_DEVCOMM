@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>OJT-TS — On-the-Job Training Tracking System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="landing-body">
+
+  <!-- Animated background grid -->
+  <div class="bg-grid"></div>
+  <div class="bg-glow glow-1"></div>
+  <div class="bg-glow glow-2"></div>
+
+  <div class="landing-container">
+    <!-- Left panel — branding -->
+    <div class="brand-panel">
+      <div class="brand-logo">
+        <span class="logo-icon">◈</span>
+        <span class="logo-text">OJT<span class="logo-accent">-TS</span></span>
+      </div>
+      <h1 class="brand-headline">Track Every<br><em>Hour.</em><br>Own Your<br>Journey.</h1>
+      <p class="brand-sub">A complete On-the-Job Training tracking platform for students and advisers. Real-time attendance, location checks, and report generation — all in one place.</p>
+      <div class="brand-pills">
+        <span class="pill">📍 Location Tracking</span>
+        <span class="pill">📋 DTR Management</span>
+        <span class="pill">📄 Report Generation</span>
+        <span class="pill">🚨 Emergency Reports</span>
+      </div>
+    </div>
+
+    <!-- Right panel — login form -->
+    <div class="login-panel">
+      <div class="login-card">
+        <div class="login-header">
+          <h2>Welcome Back</h2>
+          <p>Sign in to continue to your dashboard</p>
+        </div>
+
+        <div id="loginError" class="login-error hidden">
+          <span>⚠</span> Invalid credentials. Please try again.
+        </div>
+
+        <div class="form-group">
+          <label for="roleSelect">I am a</label>
+          <div class="role-toggle">
+            <button class="role-btn active" data-role="student" onclick="selectRole('student', this)">
+              <span class="role-icon">🎓</span> Student
+            </button>
+            <button class="role-btn" data-role="adviser" onclick="selectRole('adviser', this)">
+              <span class="role-icon">👨‍🏫</span> Adviser
+            </button>
+          </div>
+          <input type="hidden" id="roleSelect" value="student">
+        </div>
+
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Enter your username" autocomplete="off">
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password">
+        </div>
+
+        <button class="btn-login" onclick="handleLogin()">
+          Sign In <span class="btn-arrow">→</span>
+        </button>
+
+        <div class="demo-hint">
+          <p><strong>Demo Accounts:</strong></p>
+          <p>Student: <code>student1</code> / <code>pass123</code></p>
+          <p>Student: <code>student2</code> / <code>pass123</code></p>
+          <p>Adviser: <code>adviser1</code> / <code>adv456</code></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Redirect if already logged in
+    const sess = JSON.parse(localStorage.getItem('ojt_session') || 'null');
+    if (sess) {
+      window.location.href = sess.role === 'student' ? 'dashboard-student.html' : 'dashboard-adviser.html';
+    }
+
+    function selectRole(role, btn) {
+      document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('roleSelect').value = role;
+    }
+
+    function handleLogin() {
+      const role = document.getElementById('roleSelect').value;
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      const err = document.getElementById('loginError');
+
+      const user = OJT.authenticate(username, password, role);
+      if (user) {
+        err.classList.add('hidden');
+        localStorage.setItem('ojt_session', JSON.stringify(user));
+        window.location.href = role === 'student' ? 'dashboard-student.html' : 'dashboard-adviser.html';
+      } else {
+        err.classList.remove('hidden');
+        document.getElementById('password').value = '';
+      }
+    }
+
+    // Allow Enter key
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') handleLogin(); });
+  </script>
+</body>
+</html>
